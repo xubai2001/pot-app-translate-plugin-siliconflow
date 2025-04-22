@@ -1,28 +1,113 @@
 async function translate(text, from, to, options) {
-    const { config, utils } = options;
+    const { config, utils, setResult } = options;
     const { tauriFetch: fetch } = utils;
-    let { requestPath: url } = config;
-    let plain_text = text.replaceAll("/", "@@");
-    let encode_text = encodeURIComponent(plain_text);
-    if (url === undefined || url.length === 0) {
-        url = "lingva.pot-app.com"
-    }
-    if (!url.startsWith("http")) {
-        url = `https://${url}`;
-    }
-    const res = await fetch(`${url}/api/v1/${from}/${to}/${encode_text}`, {
-        method: 'GET',
-    });
+    
+    let { 
+        apiKey, 
+        model = "THUDM/GLM-4-32B-0414", 
+        temperature = "0.3", 
+        stream, 
+        max_tokens = "2048"
+    } = config;
 
-    if (res.ok) {
-        let result = res.data;
-        const { translation } = result;
-        if (translation) {
-            return translation.replaceAll("@@", "/");;
-        } else {
-            throw JSON.stringify(result.trim());
-        }
-    } else {
-        throw `Http Request Error\nHttp Status: ${res.status}\n${JSON.stringify(res.data)}`;
+    // 判断是否使用流式输出
+    const isStream = stream === "true" || stream === true;
+
+
+    
+    // 设置默认请求路径
+    const requestPath = "https://api.siliconflow.cn/v1/chat/completions";
+    
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
     }
+    
+    const body = {
+        model: model,  // 使用用户选择的模型
+        messages: [
+            {
+                "role": "system",
+                "content": "You are a professional translation engine, please translate the text into a colloquial, professional, elegant and fluent content, without the style of machine translation. You must only translate the text content, never interpret it."
+            },
+            {
+                "role": "user",
+                "content": `Translate into ${to}:\n${text}`
+            }
+        ],
+        temperature: parseFloat(temperature),
+        stream: isStream,
+        top_p: 0.7,
+        frequency_penalty: 0,
+        presence_penalty: 0,
+        max_tokens: parseInt(max_tokens),
+    }
+    
+    let res = await fetch(requestPath, {
+        method: 'POST',
+        url: requestPath,
+        headers: headers,
+        body: {
+            type: "Json",
+            payload: body
+        },
+        ...(isStream ? { responseType: ResponseType.Text } : {})
+    });
+    
+    if (!res.ok) {
+        throw new Error(`Http Request Error\nHttp Status: ${res.status}\n${JSON.stringify(res.data)}`);
+    }
+
+    // 非流式输出
+    if (!isStream) {
+        try {
+            const result = res?.data;
+            if (!result?.choices?.[0]?.message?.content) {
+                throw new Error('Invalid response format');
+            }
+            
+            return result.choices[0].message.content.trim().replace(/^"|"$/g, '');
+        } catch (error) {
+            console.error('Error:', error);
+            return ''; 
+        }
+    }
+
+    // 流式输出
+    let result = "";
+    const lines = res.data.split("\n");
+
+    for(const rawline of lines) {
+        const line = rawline.trim();
+        if (!line || !line.startsWith("data:")) 
+            continue;
+
+        const jsonLine = line.slice(5).trim();
+        if (jsonLine === "[DONE]")  // 流式输出结束标志
+            break;
+
+        try {
+            const data = JSON.parse(jsonLine);
+            const chunk = data?.choices?.[0]?.delta?.content;
+            if (chunk) {
+                result += chunk;
+                if (setResult) {
+                    setResult(result);
+                    await new Promise((res) => setTimeout(res, 50));
+                }
+            }
+        } catch (e) {
+            continue;
+        }
+    }
+    if(!result) {
+        throw new Error("No result returned from the server.");
+    }
+
+    if (setResult) {
+        await new Promise((res) => setTimeout(res, 100));
+        setResult(result);
+    }
+    return result;
+    
 }

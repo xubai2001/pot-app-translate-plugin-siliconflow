@@ -1,10 +1,81 @@
 {
-  "id": "plugin.com.pot-app.lingva",
+  "id": "plugin.com.xuabi.siliconflow",
   "plugin_type": "translate",
-  "icon": "lingva.svg",
-  "display": "Lingva",
-  "homepage": "https://github.com/pot-app/pot-app-translate-plugin-template",
-  "needs": [{ "key": "requestPath", "display": "请求地址" }],
+  "icon": "siliconflow.svg",
+  "display": "siliconflow",
+  "homepage": "https://github.com/xubai2001/pot-app-translate-plugin-siliconflow",
+  "needs": [
+    {
+      "key": "model",
+      "display": "模型选择",
+      "type": "select",
+      "options": {
+        "THUDM/GLM-4-32B-0414": "THUDM/GLM-4-32B-0414",
+        "THUDM/GLM-Z1-32B-0414": "THUDM/GLM-Z1-32B-0414",
+        "THUDM/GLM-Z1-Rumination-32B-0414": "THUDM/GLM-Z1-Rumination-32B-0414",
+        "THUDM/GLM-4-9B-0414": "THUDM/GLM-4-9B-0414",
+        "Qwen/QwQ-32B": "Qwen/QwQ-32B",
+        "Pro/deepseek-ai/DeepSeek-R1": "Pro/deepseek-ai/DeepSeek-R1",
+        "Pro/deepseek-ai/DeepSeek-V3": "Pro/deepseek-ai/DeepSeek-V3",
+        "deepseek-ai/DeepSeek-R1": "deepseek-ai/DeepSeek-R1",
+        "deepseek-ai/DeepSeek-V3": "deepseek-ai/DeepSeek-V3",
+        "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+        "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B": "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
+        "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+        "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+        "Pro/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B": "Pro/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+        "Pro/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B": "Pro/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+        "deepseek-ai/DeepSeek-V2.5": "deepseek-ai/DeepSeek-V2.5",
+        "Qwen/Qwen2.5-72B-Instruct-128K": "Qwen/Qwen2.5-72B-Instruct-128K",
+        "Qwen/Qwen2.5-72B-Instruct": "Qwen/Qwen2.5-72B-Instruct",
+        "Qwen/Qwen2.5-32B-Instruct": "Qwen/Qwen2.5-32B-Instruct",
+        "Qwen/Qwen2.5-14B-Instruct": "Qwen/Qwen2.5-14B-Instruct",
+        "Qwen/Qwen2.5-7B-Instruct": "Qwen/Qwen2.5-7B-Instruct",
+        "Qwen/Qwen2.5-Coder-32B-Instruct": "Qwen/Qwen2.5-Coder-32B-Instruct",
+        "Qwen/Qwen2.5-Coder-7B-Instruct": "Qwen/Qwen2.5-Coder-7B-Instruct",
+        "Qwen/Qwen2-7B-Instruct": "Qwen/Qwen2-7B-Instruct",
+        "Qwen/Qwen2-1.5B-Instruct": "Qwen/Qwen2-1.5B-Instruct",
+        "Qwen/QwQ-32B-Preview": "Qwen/QwQ-32B-Preview",
+        "TeleAI/TeleChat2": "TeleAI/TeleChat2",
+        "THUDM/glm-4-9b-chat": "THUDM/glm-4-9b-chat",
+        "Vendor-A/Qwen/Qwen2.5-72B-Instruct": "Vendor-A/Qwen/Qwen2.5-72B-Instruct",
+        "internlm/internlm2_5-7b-chat": "internlm/internlm2_5-7b-chat",
+        "internlm/internlm2_5-20b-chat": "internlm/internlm2_5-20b-chat",
+        "Pro/Qwen/Qwen2.5-7B-Instruct": "Pro/Qwen/Qwen2.5-7B-Instruct",
+        "Pro/Qwen/Qwen2-7B-Instruct": "Pro/Qwen/Qwen2-7B-Instruct",
+        "Pro/Qwen/Qwen2-1.5B-Instruct": "Pro/Qwen/Qwen2-1.5B-Instruct",
+        "Pro/THUDM/chatglm3-6b": "Pro/THUDM/chatglm3-6b",
+        "Pro/THUDM/glm-4-9b-chat": "Pro/THUDM/glm-4-9b-chat"
+      },
+      "default": "THUDM/GLM-4-32B-0414"
+    },
+    {
+      "key": "apiKey",
+      "display": "API密钥",
+      "type": "input"
+    },
+    {
+      "key": "temperature",
+      "display": "温度",
+      "type": "input",
+      "default": 0.3
+    },
+    {
+      "key": "stream",
+      "display": "流式输出",
+      "type": "select",
+      "options": {
+        "true": "开启",
+        "false": "关闭"
+      }
+    },
+    {
+      "key": "max_tokens",
+      "display": "最大token数(1-16384)",
+      "type": "input",
+      "default": "2048"
+    }
+  ],
   "language": {
     "auto": "auto",
     "zh_cn": "zh",
