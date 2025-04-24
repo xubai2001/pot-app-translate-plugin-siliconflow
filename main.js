@@ -76,6 +76,7 @@ async function translate(text, from, to, options) {
     // 流式输出
     let result = "";
     const lines = res.data.split("\n");
+    let firstlf = true;
 
     for(const rawline of lines) {
         const line = rawline.trim();
@@ -90,6 +91,10 @@ async function translate(text, from, to, options) {
             const data = JSON.parse(jsonLine);
             const chunk = data?.choices?.[0]?.delta?.content;
             if (chunk) {
+                if (chunk === "\n" && firstlf) {
+                    firstlf = false;
+                    continue; // 跳过第一个换行符
+                }
                 result += chunk;
                 if (setResult) {
                     setResult(result);
